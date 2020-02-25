@@ -54,7 +54,7 @@ module MathNeuron =
     /// какой термин на самом деле описывает процесс подачи значений
     /// на синапсы.
     /// </remarks>
-    let invoke (inputs: 'a list) neuron = 
+    let invoke (inputs: double list) neuron = 
         if inputs.Length = neuron.Weights.Length then
             let net = List.map2 (fun a b -> (a * b)) inputs neuron.Weights
                       |> neuron.AggregationFunction
