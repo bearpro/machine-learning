@@ -1,7 +1,7 @@
 /// <summary>
 /// Набор ассетов для решения задач машинного обучения.
 /// </summary>
-module MachineLearning
+namespace MachineLearning
 
 open System
 
