@@ -13,12 +13,12 @@ type Neuron = {
     /// <summary>
     /// Список весов на входах. Так же определяет количество входов нейрона.
     /// </summary>
-    Weights: double list
+    Weights: float list
     
     /// <summary>
     /// Пороговое значение
     /// </summary>
-    Threshold: double
+    Threshold: float
 
     /// <summary>
     /// Функция, которая должна быть применена к значениям на входе.
@@ -28,7 +28,7 @@ type Neuron = {
     /// на всякий случай оставить тут возможность использовать произвольную
     /// функцию.
     /// </remarks>
-    AggregationFunction: (double list -> double)
+    AggregationFunction: (float list -> float)
 }
 
 /// <summary>
@@ -54,7 +54,7 @@ module MathNeuron =
     /// какой термин на самом деле описывает процесс подачи значений
     /// на синапсы.
     /// </remarks>
-    let invoke (inputs: double list) neuron = 
+    let invoke (inputs: float list) neuron = 
         if inputs.Length = neuron.Weights.Length then
             let net = List.map2 (fun a b -> (a * b)) inputs neuron.Weights
                       |> neuron.AggregationFunction
