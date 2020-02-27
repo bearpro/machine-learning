@@ -8,19 +8,15 @@ module Program =
     let formatParamsAndResult2 (a : bool, b : bool) func = 
         sprintf "|%6b|%6b| -> %A" a b (func (a, b))
 
+    let network (i1, i2) =
+        ("and", ``and`` (i1, i2),
+         "or",  ``or``  (i1, i2),
+         "not", ``not`` i1)
 
     [<EntryPoint>]
     let main argv =
-        printfn "and: %s" (formatParamsAndResult2 (true, true) ``and``)
-        printfn "and: %s" (formatParamsAndResult2 (false, true) ``and``)
-        printfn "and: %s" (formatParamsAndResult2 (true, false) ``and``)
-        printfn "and: %s" (formatParamsAndResult2 (false, false) ``and``)
-       
-        printfn "or:  %s" (formatParamsAndResult2 (true, true) ``or``)
-        printfn "or:  %s" (formatParamsAndResult2 (false, true) ``or``)
-        printfn "or:  %s" (formatParamsAndResult2 (true, false) ``or``)
-        printfn "or:  %s" (formatParamsAndResult2 (false, false) ``or``)
-        
-        printfn "not: %s" (formatParamsAndResult1 false ``not``)
-        printfn "not: %s" (formatParamsAndResult1 true ``not``)
+        printfn "%s" (formatParamsAndResult2 (true, true) network)
+        printfn "%s" (formatParamsAndResult2 (true, false) network)
+        printfn "%s" (formatParamsAndResult2 (false, true) network)
+        printfn "%s" (formatParamsAndResult2 (false, false) network)
         0 // return an integer exit code
