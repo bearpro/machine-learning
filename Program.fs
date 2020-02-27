@@ -4,22 +4,22 @@ open MachineLearning.MathNeuron.LogicalOperations
 
 module Program =
     let formatParamsAndResult1 p func = 
-        sprintf "%A -> %A" p (func p)
-    let formatParamsAndResult2 p1 p2 func = 
-        sprintf "%A, %A -> %A" p1 p2 (func p1 p2)
+        sprintf "|%6b       | -> %A" p (func p)
+    let formatParamsAndResult2 (a : bool, b : bool) func = 
+        sprintf "|%6b|%6b| -> %A" a b (func (a, b))
 
 
     [<EntryPoint>]
     let main argv =
-        printfn "and: %s" (formatParamsAndResult1 (true, true) ``and``)
-        printfn "and: %s" (formatParamsAndResult1 (false, true) ``and``)
-        printfn "and: %s" (formatParamsAndResult1 (true, false) ``and``)
-        printfn "and: %s" (formatParamsAndResult1 (false, false) ``and``)
-        
-        printfn "or: %s" (formatParamsAndResult1 (true, true) ``or``)
-        printfn "or: %s" (formatParamsAndResult1 (false, true) ``or``)
-        printfn "or: %s" (formatParamsAndResult1 (true, false) ``or``)
-        printfn "or: %s" (formatParamsAndResult1 (false, false) ``or``)
+        printfn "and: %s" (formatParamsAndResult2 (true, true) ``and``)
+        printfn "and: %s" (formatParamsAndResult2 (false, true) ``and``)
+        printfn "and: %s" (formatParamsAndResult2 (true, false) ``and``)
+        printfn "and: %s" (formatParamsAndResult2 (false, false) ``and``)
+       
+        printfn "or:  %s" (formatParamsAndResult2 (true, true) ``or``)
+        printfn "or:  %s" (formatParamsAndResult2 (false, true) ``or``)
+        printfn "or:  %s" (formatParamsAndResult2 (true, false) ``or``)
+        printfn "or:  %s" (formatParamsAndResult2 (false, false) ``or``)
         
         printfn "not: %s" (formatParamsAndResult1 false ``not``)
         printfn "not: %s" (formatParamsAndResult1 true ``not``)

@@ -9,17 +9,11 @@ open System
 /// Описывает простейший математический нейрон.
 /// </summary>
 type Neuron = { 
-    
     /// <summary>
     /// Список весов на входах. Так же определяет количество входов нейрона.
     /// </summary>
     Weights: float list
     
-    /// <summary>
-    /// Пороговое значение
-    /// </summary>
-    Threshold: float
-
     /// <summary>
     /// Функция, которая должна быть применена к значениям на входе.
     /// </summary>
@@ -29,6 +23,11 @@ type Neuron = {
     /// функцию.
     /// </remarks>
     AggregationFunction: (float list -> float)
+
+    /// <summary>
+    /// Пороговая функция, описывающая результат в зависимости от результата работы AggregationFunction.
+    /// </summary>
+    ThresholdFunction: (float -> float)
 }
 
 /// <summary>
@@ -41,27 +40,25 @@ module MathNeuron =
     /// </summary>
     let create weights threshold = {
         Weights = weights
-        Threshold = threshold
+        ThresholdFunction = ((<=) threshold >> Convert.ToDouble)
         AggregationFunction = List.sum
     }
 
     /// <summary>
-    /// Подача значений на входы нейрона. Список входов должен содержать
-    /// такое число элементов, сколько весов определено у нейрона.
+    /// Активация нейрона. Список входов должен содержать такое число
+    /// элементов, сколько весов определено у нейрона.
     /// </summary>
-    /// <remarks>
-    /// У меня есть сомнения по поводу названия "invoke". Я не знаю,
-    /// какой термин на самом деле описывает процесс подачи значений
-    /// на синапсы.
-    /// </remarks>
     let invoke (inputs: float list) neuron = 
-        if inputs.Length = neuron.Weights.Length then
-            let net = List.map2 (fun a b -> (a * b)) inputs neuron.Weights
-                      |> neuron.AggregationFunction
-            if net >= neuron.Threshold 
-                then 1.0
-                else 0.0
-        else failwith (sprintf "Neuron has %d inputs, not %d" neuron.Weights.Length inputs.Length)
+        if inputs.Length = neuron.Weights.Length 
+        then
+            List.map2 (fun a b -> (a * b)) inputs neuron.Weights
+            |> neuron.AggregationFunction
+            |> neuron.ThresholdFunction
+        else 
+            failwith (sprintf "Neuron has %d inputs, not %d" neuron.Weights.Length inputs.Length)
+
+    let createinvoke weights threshold inputs = 
+        create weights threshold |> invoke inputs
 
     /// <summary>
     /// Логические операции, определённые с помощью математических нейронов.
@@ -73,20 +70,18 @@ module MathNeuron =
         /// значениям (true->1.0, false->0.0).
         /// </summary>
         let private boolToFloatList (source: bool list) = 
-            source |> List.map Convert.ToDouble
+            source
+            |> List.map Convert.ToDouble
 
         let ``and`` (a, b) = 
-            (create [1.0 ; 1.0] 2.0)
-            |> (invoke (boolToFloatList [a; b;]) )
+            createinvoke [1.0 ; 1.0] 2.0 (boolToFloatList [a; b;])
             |> Convert.ToBoolean
 
         let ``or`` (a, b) = 
-            (create [1.0 ; 1.0] 1.0)
-            |> (invoke (boolToFloatList [a; b;]) )
+            createinvoke [1.0 ; 1.0] 1.0 (boolToFloatList [a; b;])
             |> Convert.ToBoolean
 
         let ``not`` (a: bool) = 
-            (create [-1.0] 0.0)
-            |> (invoke ([Convert.ToDouble a]) )
+            createinvoke [-1.0] 0.0 ([Convert.ToDouble a])
             |> Convert.ToBoolean
         
