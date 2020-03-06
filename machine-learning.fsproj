@@ -6,6 +6,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="MathNeuron.fs" />
+    <Compile Include="NeuralNetwork.fs" />
+    <Compile Include="Practice/Practice2.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
