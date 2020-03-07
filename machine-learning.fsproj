@@ -7,6 +7,7 @@
   <ItemGroup>
     <Compile Include="MathNeuron.fs" />
     <Compile Include="NeuralNetwork.fs" />
+    <Compile Include="HebbianLearning.fs" />
     <Compile Include="Practice/Practice2.fs" />
     <Compile Include="Practice/Practice1.fs" />
     <Compile Include="Program.fs" />

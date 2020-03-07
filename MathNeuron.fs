@@ -76,7 +76,7 @@ module MathNeuron =
 
         /// <summary>
         /// Активация нейрона. Размер списка inputs должен быть равен количеству
-        /// входов нейрона (не включая пороговое значение)
+        /// входов нейрона (не включая смещение).
         /// </summary>
         let invoke (inputs: float list) neuron =
             neuron |> invoke (List.append inputs [-1.0])
