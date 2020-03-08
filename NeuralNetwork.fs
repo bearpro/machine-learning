@@ -23,13 +23,12 @@ module Network =
     | OneToOne
 
     type Layer = Neuron list
-    let sensorLayer inputs =
-        [for i in [1..inputs] do yield create [1.0] 1.0 ]
 
-    let connect layer1 connectionMatrix layer2 =
-        [(OneToOne, layer1); (connectionMatrix, layer2)]
-
-    let invokeLayer inputs (layer, connections) =
+    /// <summary>
+    /// Возбуждает группу нейронов на одному уровне сети, в соответствии с входными значениями и
+    /// матрицей соединений.
+    /// </summary>
+    let invokeLayer inputs (layer : Layer, connections) =
         match connections with
         | OneToOne -> List.map2 (fun n i -> MathNeuron.invoke [i] n) layer inputs
         | Cross -> List.map (fun n -> MathNeuron.invoke inputs n) layer
@@ -44,7 +43,10 @@ module Network =
                     )
              >> fun (neuron, inputs) -> neuron |> MathNeuron.invoke inputs)
 
-
+    /// <summary>
+    /// Выполняет передачу значений на вход верхнему уровню сети, и возвращает результат
+    /// с последнего уровня.
+    /// </summary>
     let rec invoke inputs network =
         match network with
         | [(connections: ConnectionMatrix, layer: Layer)] ->
