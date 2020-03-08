@@ -6,29 +6,41 @@ namespace MachineLearning
 open System
 
 /// <summary>
+/// Показывает, нужно ли передать -1 на последний вход, для использования смещения.
+/// </summary>
+type InvokationMode =
+    | Normal
+    | Offset
+
+/// <summary>
 /// Описывает простейший математический нейрон.
 /// </summary>
-type Neuron = {
-    /// <summary>
-    /// Список весов на входах. Так же определяет количество входов нейрона.
-    /// </summary>
-    Weights: float list
+type Neuron =
+    {
+      /// <summary>
+      /// Список весов на входах. Так же определяет количество входов нейрона.
+      /// </summary>
+      Weights: float list
 
-    /// <summary>
-    /// Функция, которая должна быть применена к значениям на входе.
-    /// </summary>
-    /// <remarks>
-    /// В математическом нейроне эта функция - сумма всех значений. Я решил
-    /// на всякий случай оставить тут возможность использовать произвольную
-    /// функцию.
-    /// </remarks>
-    AggregationFunction: (float list -> float)
+      /// <summary>
+      /// Функция, которая должна быть применена к значениям на входе.
+      /// </summary>
+      /// <remarks>
+      /// В математическом нейроне эта функция - сумма всех значений. Я решил
+      /// на всякий случай оставить тут возможность использовать произвольную
+      /// функцию.
+      /// </remarks>
+      AggregationFunction: float list -> float
 
-    /// <summary>
-    /// Пороговая функция, описывающая результат в зависимости от результата работы AggregationFunction.
-    /// </summary>
-    ThresholdFunction: (float -> float)
-}
+      /// <summary>
+      /// Пороговая функция, описывающая результат в зависимости от результата работы AggregationFunction.
+      /// </summary>
+      ThresholdFunction: float -> float
+
+      /// <summary>
+      /// Показывает, нужно ли передать -1 на последний вход, для использования смещения.
+      /// </summary>
+      InvokationMode: InvokationMode }
 
 /// <summary>
 /// Операции над математическим нейроном.
@@ -38,48 +50,28 @@ module MathNeuron =
     /// <summary>
     /// Создание математического нейрона с указынными весами и порогом.
     /// </summary>
-    let create weights threshold = {
-        Weights = weights
-        ThresholdFunction = ((<=) threshold >> Convert.ToDouble)
-        AggregationFunction = List.sum
-    }
+    let create weights threshold =
+        { Weights = threshold :: weights
+          ThresholdFunction = ((<=) 0.0 >> Convert.ToDouble)
+          AggregationFunction = List.sum
+          InvokationMode = Offset }
 
     /// <summary>
     /// Активация нейрона. Список входов должен содержать такое число
     /// элементов, сколько весов определено у нейрона.
     /// </summary>
     let invoke (inputs: float list) neuron =
-        if inputs.Length = neuron.Weights.Length
-        then
+        match neuron with
+        | { InvokationMode = Normal } ->
             List.map2 (fun a b -> (a * b)) inputs neuron.Weights
             |> neuron.AggregationFunction
             |> neuron.ThresholdFunction
-        else
-            failwith (sprintf "Neuron has %d inputs, not %d" neuron.Weights.Length inputs.Length)
+        | { InvokationMode = Offset } ->
+            List.map2 (fun a b -> (a * b)) (-1.0 :: inputs) neuron.Weights
+            |> neuron.AggregationFunction
+            |> neuron.ThresholdFunction
 
-    let createinvoke weights threshold inputs =
-        create weights threshold |> invoke inputs
-
-    /// <summary>
-    /// Операции над нейроном, учитывающие понятие "смещение".
-    /// Смещение аналогично простейшей пороговой функции, в смысле возможности
-    /// настройки.
-    /// </summary>
-    module Offset =
-
-        /// <summary>
-        /// Создание математического нейрона с указынными весами и смещением.
-        /// Пороговое значение - 1.0
-        /// </summary>
-        let create weights offset =
-            create (List.append weights [offset]) 1.0
-
-        /// <summary>
-        /// Активация нейрона. Размер списка inputs должен быть равен количеству
-        /// входов нейрона (не включая смещение).
-        /// </summary>
-        let invoke (inputs: float list) neuron =
-            neuron |> invoke (List.append inputs [-1.0])
+    let createinvoke weights threshold inputs = create weights threshold |> invoke inputs
 
     /// <summary>
     /// Логические операции, определённые с помощью математических нейронов.
@@ -90,18 +82,10 @@ module MathNeuron =
         /// Возвращает список натуральных чисел, соответсвующих логическим
         /// значениям (true->1.0, false->0.0).
         /// </summary>
-        let private boolToFloatList (source: bool list) =
-            source
-            |> List.map Convert.ToDouble
+        let private boolToFloatList (source: bool list) = source |> List.map Convert.ToDouble
 
-        let ``and`` (a, b) =
-            createinvoke [1.0 ; 1.0] 2.0 (boolToFloatList [a; b;])
-            |> Convert.ToBoolean
+        let ``and`` (a, b) = createinvoke [ 1.0; 1.0 ] 2.0 (boolToFloatList [ a; b ]) |> Convert.ToBoolean
 
-        let ``or`` (a, b) =
-            createinvoke [1.0 ; 1.0] 1.0 (boolToFloatList [a; b;])
-            |> Convert.ToBoolean
+        let ``or`` (a, b) = createinvoke [ 1.0; 1.0 ] 1.0 (boolToFloatList [ a; b ]) |> Convert.ToBoolean
 
-        let ``not`` (a: bool) =
-            createinvoke [-1.0] 0.0 ([Convert.ToDouble a])
-            |> Convert.ToBoolean
+        let not (a: bool) = createinvoke [ -1.0 ] 0.0 ([ Convert.ToDouble a ]) |> Convert.ToBoolean

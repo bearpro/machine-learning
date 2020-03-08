@@ -56,7 +56,7 @@ module HebbianLearning =
     let private iscorrect learningTable neuron =
         learningTable
         |> Seq.ofList
-        |> Seq.map (fun { Inputs = inputs; Output = expected } -> MathNeuron.Offset.invoke inputs neuron = expected)
+        |> Seq.map (fun { Inputs = inputs; Output = expected } -> MathNeuron.invoke inputs neuron = expected)
         |> Seq.tryFindIndex ((=) false)
         |> function
         | Some index -> Error(index)
