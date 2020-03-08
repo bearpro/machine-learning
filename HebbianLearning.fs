@@ -16,27 +16,17 @@ module HebbianLearning =
     type LearningTable = LearningTarget list
 
     /// <summary>
-    /// Возвращает список без последнего элемента.
-    /// </summary>
-    let private skiplast source =
-        let array = source |> Array.ofList
-        let length = array.Length
-        array
-        |> Array.take (length - 1)
-        |> List.ofArray
-
-
-    /// <summary>
     /// Выполняет модификацию весов нейрона таким образом, чтобы они соответсвовали данной
     /// записи в таблице истинности.
     /// </summary>
-    let private fixWeights learningTarget neuron: Neuron =
-        let newWeight weight input = weight + input * learningTarget.Output
-        let newOffset weight = weight - learningTarget.Output
+    let private fixWeights learningTarget (learnCoeficient, forgetCoeficient) neuron : Neuron =
+        let newWeight weight input =
+            weight * (1.0 - forgetCoeficient) + learnCoeficient * input * learningTarget.Output
+        let newOffset offset =
+            offset * (1.0 - forgetCoeficient) - learnCoeficient *         learningTarget.Output
         { neuron with
               Weights =
-                  (List.map2 newWeight (skiplast neuron.Weights) learningTarget.Inputs)
-                  @ [ newOffset (neuron.Weights |> List.last) ] }
+                  newOffset neuron.Weights.Head :: (List.map2 newWeight neuron.Weights.Tail learningTarget.Inputs)}
 
 (*
 лю
@@ -62,15 +52,14 @@ module HebbianLearning =
         | Some index -> Error(index)
         | None -> Correct
 
-
     /// <summary>
     /// Обучает нейрон по модели Хебба. Возвращает обученный нейрон,
     /// с правильно настроенными весами.
     /// </summary>
-    let rec study learningTable neuron =
+    let rec study learningTable coefficient neuron  =
         match iscorrect learningTable neuron with
         | Correct -> neuron
         | Error index ->
             neuron
-            |> fixWeights learningTable.[index]
-            |> study learningTable
+            |> fixWeights learningTable.[index] coefficient
+            |> study learningTable coefficient

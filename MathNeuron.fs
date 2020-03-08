@@ -52,7 +52,7 @@ module MathNeuron =
     /// </summary>
     let create weights threshold =
         { Weights = threshold :: weights
-          ThresholdFunction = ((<=) 0.0 >> Convert.ToDouble)
+          ThresholdFunction = ((<=) 0.0 >> fun sum -> if sum then 1.0 else -1.0 )
           AggregationFunction = List.sum
           InvokationMode = Offset }
 
