@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Utils.fs" />
     <Compile Include="MathNeuron.fs" />
     <Compile Include="NeuralNetwork.fs" />
     <Compile Include="HebbianLearning.fs" />
