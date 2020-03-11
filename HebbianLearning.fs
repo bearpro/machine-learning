@@ -1,6 +1,7 @@
 namespace MachineLearning
 
 module HebbianLearning =
+    open Utils
 
     /// <summary>
     /// Представляет отдельную запись в таблице значений обучающего набора.
@@ -19,16 +20,14 @@ module HebbianLearning =
     /// Выполняет модификацию весов нейрона таким образом, чтобы они соответсвовали данной
     /// записи в таблице истинности.
     /// </summary>
-    let private fixWeights learningTarget (learnCoeficient, forgetCoeficient) neuron : Neuron =
-        let newWeight weight input =
-            weight * (1.0 - forgetCoeficient) + learnCoeficient * input * learningTarget.Output
-        let newOffset offset =
-            offset * (1.0 - forgetCoeficient) - learnCoeficient *         learningTarget.Output
+    let private fixWeights learningTarget (learnCoeficient, forgetCoeficient) neuron: Neuron =
+        let newWeight weight input = weight * (1.0 - forgetCoeficient) + learnCoeficient * input * learningTarget.Output
+        let newOffset offset = offset * (1.0 - forgetCoeficient) - learnCoeficient * learningTarget.Output
         { neuron with
               Weights =
-                  newOffset neuron.Weights.Head :: (List.map2 newWeight neuron.Weights.Tail learningTarget.Inputs)}
+                  newOffset neuron.Weights.Head :: (List.map2 newWeight neuron.Weights.Tail learningTarget.Inputs) }
 
-(*
+    (*
 лю
 *)
 
@@ -56,10 +55,23 @@ module HebbianLearning =
     /// Обучает нейрон по модели Хебба. Возвращает обученный нейрон,
     /// с правильно настроенными весами.
     /// </summary>
-    let rec study learningTable coefficient neuron  =
+    let rec studyNeuron learningTable coefficients neuron =
         match iscorrect learningTable neuron with
         | Correct -> neuron
         | Error index ->
             neuron
-            |> fixWeights learningTable.[index] coefficient
-            |> study learningTable coefficient
+            |> fixWeights learningTable.[index] coefficients
+            |> studyNeuron learningTable coefficients
+
+    let studyLayer (studySet: (int * LearningTable) list) coefficients neurons =
+        neurons
+        |> Utils.enumerate
+        |> List.map (fun (neuronIndex, neuron) ->
+            (neuron
+             |> (coefficients
+                 |> studyNeuron
+                     (studySet
+                      |> List.filter (fun (tableIndex, table) -> tableIndex = neuronIndex)
+                      |> List.exactlyOne
+                      |> function
+                      | _, x -> x))))
