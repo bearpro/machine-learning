@@ -11,6 +11,7 @@
     <Compile Include="HebbianLearning.fs" />
     <Compile Include="Practice/Practice2.fs" />
     <Compile Include="Practice/Practice1.fs" />
+    <Compile Include="Practice/Practice3.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
