@@ -17,13 +17,15 @@ module Practice2 =
         /// <para>Например, строка "##.." будет распознана как [1.0; 1.0; -1.0; -1.0].</para>
         /// <para>Символы кроме '#' и '.' игнорируются.</para>
         /// </summary>
-        let parse string: float list =
-            string
-            |> Seq.fold (fun acc item ->
-                match item with
-                | '#' -> 1.0 :: acc
-                | '.' -> -1.0 :: acc
-                | _ -> acc) []
+        let parse pairs input =
+            let valueof item = pairs |> Seq.tryPick (function
+                                     | char, value when char = item -> Some value
+                                     | _ -> None)
+            input
+            |> Seq.map valueof
+            |> Seq.filter Option.isSome
+            |> Seq.map Option.get
+            |> List.ofSeq
 
         /// <summary>
         /// Возвращает все образы из папки, с их именами и строковыми представлениями.
@@ -31,26 +33,27 @@ module Practice2 =
         let loadInputs path =
             if Directory.Exists path then
                 Directory.EnumerateFiles path
-                |> List.ofSeq
-                |> List.map
-                    (fun file -> ((Path.GetFileName file), File.ReadAllText file)
-                     >> fun (name, content) -> (name, content, parse content))
+                |> Seq.map
+                    (fun f -> (Path.GetFileName f, File.ReadAllText f)
+                     >> fun (name, content) -> (name, content, parse ['#', 1.0; '.', -1.0] content))
             else
                 failwith "Такой директории не существует"
 
         /// <summary>
         /// Загружает обучающий набор из папки.
         /// </summary>
-        let load path: (int * LearningTable) list =
-            let parsedInputs = loadInputs path |> List.map (fun (name, _, pixels) -> (Int32.Parse name, pixels))
-            parsedInputs
-            |> List.map (fun (number, pixels) ->
-                (number,
-                 parsedInputs
-                 |> List.map (fun (item, pixels) ->
-                     { Inputs = pixels
-                       Output =
-                           if item = number then 1.0 else -1.0 })))
+        let load path: LearningTable list =
+            let parsed =
+                path
+                |> loadInputs
+                |> Seq.map (fun (name, _, image) -> Int32.Parse(name), image)
+                |> List.ofSeq
+            [ for nA in [ 1 .. parsed.Length ] ->
+                List.map (fun (nB, model) ->
+                    let output =
+                        if nA = nB then 1.0 else -1.0
+                    { Output = output
+                      Inputs = model }) parsed ]
 
     let bits integer =
         let rec re =
@@ -70,29 +73,26 @@ module Practice2 =
         |> re
         |> List.rev
         |> offset
+        |> List.map (function
+            | 0 -> -1.0
+            | 1 -> 1.0
+            | _ -> failwith "Not valid value.")
 
-    let integersStudySet =
+    let integersStudySet: LearningTable list =
         let allBits =
-            [ 0 .. 9 ]
-            |> List.map
-                (bits
-                 >> List.map (function
-                     | 0 -> -1.0
-                     | 1 -> 1.0
-                     | _ -> failwith "Not valid value."))
+            [ for n in [ 0 .. 9 ] -> bits n ]
 
         let baseArray = System.Collections.Immutable.ImmutableArray.CreateRange([ 0 .. 9 ] |> List.map (fun _ -> -1.0))
         let allInputs = [ 0 .. 9 ] |> List.map ((fun i -> baseArray.SetItem(i, 1.0)) >> List.ofSeq)
         [ 0 .. 3 ]
         |> List.map (fun neuronIndex ->
-            (neuronIndex,
-             List.map2 (fun inputs (bits: float list) ->
-                 { Inputs = inputs
-                   Output =
-                       match bits.[neuronIndex] with
-                       | -1.0 -> -1.0
-                       | 1.0 -> 1.0
-                       | _ -> failwith "Not valid value." }) allInputs allBits))
+            List.map2 (fun inputs (bits: float list) ->
+                { Inputs = inputs
+                  Output =
+                      match bits.[neuronIndex] with
+                      | -1.0 -> -1.0
+                      | 1.0 -> 1.0
+                      | _ -> failwith "Not valid value." }) allInputs allBits)
 
     /// <summary>
     /// Конструирует нейронную сеть, обучая второй уровень ("A-элементы") с помощью
@@ -141,6 +141,7 @@ module Practice2 =
     /// </summary>
     let test path network =
         let set = ImageSet.loadInputs path
+
         let item =
             function
             | -1.0 -> 0
