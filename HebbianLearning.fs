@@ -1,8 +1,6 @@
 namespace MachineLearning
 
 module HebbianLearning =
-    open Utils
-
     /// <summary>
     /// Представляет отдельную запись в таблице значений обучающего набора.
     /// </summary>
@@ -60,5 +58,5 @@ module HebbianLearning =
             |> fixWeights target coefficients
             |> studyNeuron learningTable coefficients
 
-    let studyLayer (studySet: (int * LearningTable) list) coefficients neurons =
-        List.map2 (fun neuron (_, table) -> studyNeuron table coefficients neuron) neurons studySet
+    let studyLayer (studySet: LearningTable list) coefficients neurons =
+        List.map2 (fun neuron table -> studyNeuron table coefficients neuron) neurons studySet
