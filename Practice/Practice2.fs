@@ -5,6 +5,7 @@ open System
 module Practice2 =
     open Network
     open HebbianLearning
+    open Utils
 
     /// <summary>
     /// Содержит описание работы с файлами образов.
@@ -99,17 +100,9 @@ module Practice2 =
     /// обучающего наора 'aLayerStudySet'. Возвращает обученную нейронную сеть.
     /// </summary>
     let network: (ConnectionMatrix * Layer) list =
-        let sLayer =
-            [ for i in [ 1 .. 15 ] do
-                yield MathNeuron.create [ 1.0 ] 1.0 ]
-
-        let aLayer =
-            [ for number in [ 0 .. 9 ] ->
-                MathNeuron.create [ for _ in [ 0 .. 14 ] -> 0.0 ] 0.0 ]
-
-        let rLayer =
-            [ for _ in [ 0 .. 3 ] ->
-                MathNeuron.create [ for _ in [ 0 .. 9 ] -> 0.0 ] 0.0 ]
+        let sLayer = MathNeuron.create (1.0 *| 1) 1.0 *| 15
+        let aLayer = MathNeuron.create (0.0 *| 14) 0.0 *| 9
+        let rLayer = MathNeuron.create (0.0 *| 9) 0.0 *| 3
 
         [ (OneToOne, sLayer)
           (Cross, aLayer)
