@@ -1,12 +1,12 @@
 namespace MachineLearning
 
 open System
+open MachineLearning.Network
+open MachineLearning.Learning
+open MachineLearning.Learning.HebbianRule
+open MachineLearning.Utils
 
 module Practice2 =
-    open Network
-    open Learning.HebbianRule
-    open Utils
-
     /// <summary>
     /// Содержит описание работы с файлами образов.
     /// </summary>
