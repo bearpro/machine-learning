@@ -1,6 +1,9 @@
-namespace MachineLearning
+namespace MachineLearning.Learning
 
-module HebbianLearning =
+open MachineLearning
+open MachineLearning.MathNeuron
+
+module HebbianRule =
     /// <summary>
     /// Представляет отдельную запись в таблице значений обучающего набора.
     /// </summary>

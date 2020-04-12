@@ -4,7 +4,7 @@ open System
 
 module Practice2 =
     open Network
-    open HebbianLearning
+    open Learning.HebbianRule
     open Utils
 
     /// <summary>
@@ -123,7 +123,7 @@ module Practice2 =
                 Output = 1.0 } ]
 
         let neuron = MathNeuron.create [ 0.0; 0.0 ] 0.0
-        let smartNeuron = neuron |> HebbianLearning.studyNeuron table (0.5, 0.0)
+        let smartNeuron = neuron |> studyNeuron table (0.5, 0.0)
         ()
 
     /// <summary>
