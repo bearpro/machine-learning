@@ -4,7 +4,7 @@ open MachineLearning.MathNeuron
 open MachineLearning.Network
 open MachineLearning.Utils
 
-module Practice2 =
+module Practice3 =
     let neuron weights =
         { Weights = weights
           ThresholdFunction = ((<=) 0.0 >> fun sum -> if sum then 1.0 else 0.0 )
