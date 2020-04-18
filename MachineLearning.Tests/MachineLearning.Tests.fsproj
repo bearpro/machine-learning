@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Utils.fs" />
     <Compile Include="Learning.DeltaRule/DeltaRule.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
