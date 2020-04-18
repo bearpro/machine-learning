@@ -8,6 +8,7 @@
     <Compile Include="Utils.fs" />
     <Compile Include="MathNeuron.fs" />
     <Compile Include="NeuralNetwork.fs" />
+    <Compile Include="Learning/Learning.fs" />
     <Compile Include="Learning/HebbianRule.fs" />
     <Compile Include="Learning/DeltaRule.fs" />
     <Compile Include="Practice/Practice2.fs" />
