@@ -6,10 +6,12 @@ open MachineLearning.Utils
 
 module Practice3 =
     let neuron weights =
+        let threshold sum =
+            if sum >= 1.0 then 1.0 else 0.0
         { Weights = weights
-          ThresholdFunction = ((<=) 0.0 >> fun sum -> if sum then 1.0 else 0.0 )
+          ThresholdFunction = threshold
           AggregationFunction = Seq.sum
-          InvokationMode = InvokationMode.Normal }
+          InvokationMode = Normal }
 
     /// Возвращает однослойную нейронную сеть, имеющую inputCount нейронов на сенсорном слое,
     /// и imageCount нейронов на выходном слое.

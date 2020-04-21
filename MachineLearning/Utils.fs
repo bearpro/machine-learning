@@ -3,16 +3,28 @@ open System
 
 module Utils =
     let enumerate list =
-        let rec re list index =
-            match list with
-            | [] -> []
-            | [item] -> [(index, item)]
-            | head::tail -> (index, head) :: re tail (index + 1)
-        re list 0
+        list
+        |> List.mapi (fun index item -> index, item)
 
     /// Возвращает список из n значений value.
     let times value n =
-        [for _ in 0..n -> value]
+        [for _ in 1..n -> value]
 
     /// Оператор повторения заданного значения n раз.
     let ( *| ) = times
+
+    /// Возвращает последовательность той же длины, с последним элементом, равным указанному value.
+    let withLast value sequence =
+        sequence
+        |> Seq.rev
+        |> Seq.tail
+        |> fun sequence -> seq {
+            yield value
+            yield! sequence
+        }
+        |> Seq.rev
+
+    /// Возвращает последовательность той же длины, применя к последнему элементу указанную функцию.
+    let withLastf func sequence =
+        sequence
+        |> withLast ( (Seq.last >> func) sequence )
