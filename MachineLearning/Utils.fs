@@ -13,6 +13,10 @@ module Utils =
     /// Оператор повторения заданного значения n раз.
     let ( *| ) = times
 
+    let set index value list =
+        list
+        |> List.mapi (fun i item -> if i = index then value else item)
+
     /// Возвращает последовательность той же длины, с последним элементом, равным указанному value.
     let withLast value sequence =
         sequence
