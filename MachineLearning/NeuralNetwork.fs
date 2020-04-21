@@ -54,3 +54,14 @@ module Network =
         | (connections: ConnectionMatrix, layer: Layer) :: tail ->
             tail |> invoke (invoke inputs [(connections, layer)])
         | [] -> failwith "Невозможно выполнять вычисления в пустой нейронной сети."
+
+    let neuronsAtLayer index network : Layer =
+        network
+        |> List.item index
+        |> fun (_, neurons) -> neurons
+
+    let neuronsAtLayerBack index network : Layer =
+        network
+        |> List.rev
+        |> List.item index
+        |> fun (_, neurons) -> neurons
