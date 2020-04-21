@@ -35,6 +35,6 @@ module DeltaRule =
                               [ 1.0; 1.0; 1.0 ], [ 1.0; 1.0] ]
         let net = Practice3.network 3 2
         DeltaRule.learningCoefficient <- (1.0 / 16.0)
-        let studiedNet = studyTillCompleted learningTable net
+        let studiedNet = studyTillCompleted (Network.neuronsAtLayer 1) learningTable net
         for input, output in learningTable do
             Assert.Equal<float> ( (studiedNet |> Network.invoke input ), output )

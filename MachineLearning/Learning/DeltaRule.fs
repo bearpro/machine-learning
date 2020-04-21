@@ -45,7 +45,7 @@ module DeltaRule =
         |> withLastf (fun (connections, oldNeurons) -> connections, newNeurons)
         |> List.ofSeq
 
-    let rec studyTillCompleted targets network =
+    let rec studyTillCompleted getLayer targets network =
         if isNetCompleted targets network
         then network
         else
@@ -57,4 +57,7 @@ module DeltaRule =
                     e
                     |> Seq.tryFind (fun iError -> iError <> 0.0)
                     |> Option.isSome )
-            |> fun (input, output) -> studyTillCompleted targets (epoch input output network)
+            |> fun (input, output) ->
+                network
+                |> epoch input output (getLayer)
+                |> studyTillCompleted (getLayer) targets
