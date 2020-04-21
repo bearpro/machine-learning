@@ -8,11 +8,11 @@ open MachineLearning.Network
 open MachineLearning.Utils
 open CommandLine
 
-module TrainingSet =
+module ImageSet =
     type Item =
         { Name: string
           Index: int
-          Values: bool array }
+          Values: float list }
 
     module Item =
         let format item =
@@ -20,7 +20,7 @@ module TrainingSet =
             text.WriteLine (sprintf "%s [%i]" item.Name item.Index)
             for i in 0..23 do
                 for j in 0..23 do
-                    text.Write (if item.Values.[i*24+j] then '#' else ' ')
+                    text.Write (if item.Values.[i*24+j] > 0.5 then '#' else ' ')
                 text.WriteLine()
             text.ToString()
 
@@ -32,8 +32,8 @@ module TrainingSet =
                     cartesian [0..23] [0..23]
                     |> Seq.map (bmp.GetPixel
                     >> fun color -> color.GetBrightness()
-                    >> fun brightness -> brightness < 0.5f )
-                    |> Array.ofSeq
+                    >> fun brightness -> if brightness > 0.5f then 1.0 else 0.0 )
+                    |> List.ofSeq
                 yield { Name = FileInfo(path).Name
                         Index = index
                         Values = pixels }
