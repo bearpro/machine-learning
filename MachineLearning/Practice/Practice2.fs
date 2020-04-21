@@ -5,6 +5,7 @@ open MachineLearning.Network
 open MachineLearning.Learning
 open MachineLearning.Learning.HebbianRule
 open MachineLearning.Utils
+open CommandLine
 
 module Practice2 =
     /// <summary>
@@ -152,12 +153,16 @@ module Practice2 =
             ()
         ()
 
+    [<Verb("task2")>]
+    type Options =
+        { [<Value(0, MetaName = "input", Required = true, MetaValue = "DIR", HelpText = "Путь к директории с файлами моделей.")>]
+          InputDirectory: string }
 
     /// <summary>
     /// Точка входа в модуль презентации результатов второго практического занятия.
     /// </summary>
-    let main() =
-        let studySet = ImageSet.load @"./Practice/Practice 2 study set"
+    let run options =
+        let studySet = ImageSet.load options.InputDirectory
 
         let net =
             network
@@ -171,4 +176,4 @@ module Practice2 =
                   (w2, n2 |> studyLayer studySet (1.0, 0.0)) ]
             | _ -> failwith "Незапланированная структура нейронной сети."
         net |> test @"./Practice/Practice 2 study set"
-        ()
+        0

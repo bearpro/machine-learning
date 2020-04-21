@@ -3,8 +3,14 @@ namespace MachineLearning
 open MachineLearning.MathNeuron
 open MachineLearning.Network
 open MachineLearning.Utils
+open CommandLine
 
 module Practice3 =
+    [<Verb("task3")>]
+    type Options =
+        { [<Value(0, MetaName = "input", MetaValue = "[FILE|DIR]...")>]
+          InputFiles: string seq }
+
     let neuron weights =
         let threshold sum =
             if sum >= 1.0 then 1.0 else 0.0
@@ -20,3 +26,6 @@ module Practice3 =
         let aLayer = neuron (0.0 *| inputCount) *| imageCount
         [ OneToOne, sLayer
           Cross, aLayer ]
+
+    let run options =
+        0
