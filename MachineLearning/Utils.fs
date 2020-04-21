@@ -28,3 +28,11 @@ module Utils =
     let withLastf func sequence =
         sequence
         |> withLast ( (Seq.last >> func) sequence )
+
+    /// Возвращает декартово произвдение двух множеств.
+    let cartesian a b =
+        seq {
+            for i in a do
+                for j in b do
+                    yield j, i
+        }
