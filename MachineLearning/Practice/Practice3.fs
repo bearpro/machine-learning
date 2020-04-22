@@ -10,7 +10,7 @@ open MachineLearning.ImageSet
 open CommandLine
 
 module Practice3 =
-    [<Verb("task3-train")>]
+    [<Verb("task3")>]
     type Options =
         { [<Option("train-set", Group = "training", MetaValue = "[FILE|DIR]...")>]
           TrainSet: string seq
@@ -20,6 +20,8 @@ module Practice3 =
           DumpTrained: bool
           [<Value(0, MetaName = "test set", MetaValue = "[FILE|DIR]...")>]
           TestSet: string seq
+          [<Option("display-neurons", Default = false, HelpText = "Включить отображение значений выходных сигналов нейронов последнего слоя.")>]
+          DisplayNeuronOut: bool
           [<Option('c', "coefficient", Default = 1.0, MetaValue = "FLOAT")>]
           Coefficiend: float}
 
@@ -65,13 +67,17 @@ module Practice3 =
         |> getPaths
         |> ImageSet.read
 
-    let test trainingSet testSet net =
+    let test options trainingSet testSet net =
         for image in testSet do
             let output = net |> Network.invoke image.Values
-            let activeIndex = output |> List.findIndex (fun x -> x > 0.5)
-            let matchedImage = trainingSet |> Seq.find(fun x -> x.Index = activeIndex)
+            let maxIndex = output |> List.mapi (fun i v -> i, v) |> List.maxBy (fun (i, v) -> v) |> fun (i, _) -> i
+            let matchedImage = trainingSet |> Seq.find(fun x -> x.Index = maxIndex)
             printfn "Image: '%s'; Neuron: '%s' (%i)" image.Name matchedImage.Name matchedImage.Index
-            printfn "Exact output: %A" output
+            if options.DisplayNeuronOut then
+                printf "Output: "
+                for value, image in (List.map2 (fun a b -> a, b.Name) output (List.ofSeq trainingSet)) do
+                    printf "%s: %.2f; " image value
+                printfn ""
 
     let run options =
         let trainSet =
@@ -89,5 +95,5 @@ module Practice3 =
             options.TestSet
             |> getPaths
             |> ImageSet.read
-        test trainSet testSet smartNet
+        test options trainSet testSet smartNet
         0
