@@ -5,15 +5,15 @@ open MachineLearning.MathNeuron.LogicalOperations
 open CommandLine
 
 module Program =
+    do Console.OutputEncoding <- Encoding.UTF8
+
     let argparser = Parser.Default
 
     [<EntryPoint>]
     let main argv =
-        Console.OutputEncoding <- Encoding.UTF8
         let result = argparser.ParseArguments<Practice1.Options,
                                               Practice2.Options,
                                               Practice3.Options> argv
-
         match result with
         | :? Parsed<obj> as command ->
             match command.Value with
