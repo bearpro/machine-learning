@@ -6,9 +6,12 @@ open MachineLearning
 
 module DeltaRule =
     let mutable learningCoefficient = 1.0
+
+    /// Возвращает вектор ошибки
     let error actual expected : float list =
         List.map2 (-) expected actual
 
+    /// Возвращает новый вес на основе старого веса, входного значения для данной связи и ошибки данного нейрона.
     let newWeight coefficient error oldWeight input : float =
         oldWeight + coefficient * error * input
 
@@ -18,43 +21,39 @@ module DeltaRule =
         |> Seq.tryFind (fun target -> (invoke target.Inputs neuron) <> (target.Output))
         |> Option.isNone
 
+    /// Возвращает истину, если нейронная сеть правильно обрабаотывает все значения в обучающей таблице.
     let isNetCompleted targets network =
         targets
         |> List.tryFind (fun (inputs, expectedOut) ->
             let actualOut = network |> Network.invoke inputs
             actualOut <> expectedOut)
-        |> function
-        | None   -> true
-        | Some _ -> false
+        |> Option.isNone
 
-    /// Выполняет обучение однослойной нейронной сети
+    /// Выполняет обучение указанного слоя нейронной сети.
     let epoch input expectedOut getLayer network =
-        let actualOut = network |> MachineLearning.Network.invoke input
+        let actualOut = Network.invoke input network
         let error = error actualOut expectedOut
         let layer = getLayer network
         let iItems = List.map2 (fun iError iNeuron -> iError, iNeuron) error layer
-        let newNeurons =
+        let neurons =
             iItems
             |> List.map (fun (iError, iNeuron) ->
-                { iNeuron
-                    with
-                        Weights =
-                            List.map2 (newWeight learningCoefficient iError) iNeuron.Weights input }
-            )
+                let weights = List.map2 (newWeight learningCoefficient iError) iNeuron.Weights input
+                { iNeuron with Weights = weights} )
         network
-        |> withLastf (fun (connections, oldNeurons) -> connections, newNeurons)
+        |> withLastf (fun (connections, _) -> connections, neurons)
         |> List.ofSeq
 
+    /// Выполняет обучение до тех пор, пока сеть не будет соответсвовать обучающей таблице.
     let rec studyTillCompleted getLayer targets network =
         if isNetCompleted targets network
         then network
         else
             targets
             |> List.find (
-                fun (input, expected) ->
+                fun (input, expectedOut) ->
                     let actualOut = Network.invoke input network
-                    let e = error actualOut expected
-                    e
+                    error actualOut expectedOut
                     |> Seq.tryFind (fun iError -> iError <> 0.0)
                     |> Option.isSome )
             |> fun (input, output) ->

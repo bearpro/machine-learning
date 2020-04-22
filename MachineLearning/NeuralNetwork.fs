@@ -1,8 +1,5 @@
 namespace MachineLearning
 
-open System
-open MachineLearning.MathNeuron
-
 module Network =
     type ConnectionMatrix =
     /// <summary>
@@ -55,11 +52,13 @@ module Network =
             tail |> invoke (invoke inputs [(connections, layer)])
         | [] -> failwith "Невозможно выполнять вычисления в пустой нейронной сети."
 
+    /// Возвращает список нейронов, расположенных на указанном слое сети.
     let neuronsAtLayer index network : Layer =
         network
         |> List.item index
         |> fun (_, neurons) -> neurons
 
+    /// Возвращает список нейронов, расположенных на указанном слое сети (начиная с конца).
     let neuronsAtLayerBack index network : Layer =
         network
         |> List.rev

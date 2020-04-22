@@ -1,4 +1,5 @@
 ﻿namespace MachineLearning
+
 open System
 open System.Text
 open MachineLearning.MathNeuron.LogicalOperations
